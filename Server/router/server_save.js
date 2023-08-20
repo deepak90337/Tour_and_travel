@@ -1,8 +1,9 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const Tour = require('../model/userSchema'); // Assuming tour.js is in the same folder as server.js
 const cors = require('cors'); 
+const mongoose = require('../DB/conn');
+const { loginUser } = require('./test_login2');
 
 const app = express();
 const port = 5000;
@@ -11,18 +12,9 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Connect to MongoDB Atlas
-mongoose
-  .connect('mongodb+srv://vishwakarmadeepak59510:deepak90337@cluster0.q3oscss.mongodb.net/User?retryWrites=true&w=majority', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
-  .then(() => {
-    console.log('Connected to MongoDB Atlas');
-  })
-  .catch((error) => {
-    console.error('Failed to connect to MongoDB Atlas', error);
-  });
-
+app.post('/api/login', async (req, res) => {
+  await loginUser(req, res); // Use the loginUser function from test-login.js
+});
 // Create a route to handle the incoming POST request
 app.post('/api/tours', (req, res) => {
   const tourData = req.body;
