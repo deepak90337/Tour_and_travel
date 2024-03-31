@@ -1,35 +1,50 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-//import UserProfile from "./UserProfile";
+import { jwtDecode } from "jwt-decode";
+import { useAuth } from "../context/userAuthContext";
 //import { useCookies } from 'react-cookie';
 //import Register from "../pages/Register";
 //import Login from "../pages/Login";
+
 
 const Header = () => {
   // const [isLoginFormVisible, setIsLoginFormVisible] = useState(false);
   // const [isRegisterFormVisible, setIsRegisterFormVisible] = useState(false);
   const navigate = useNavigate();
-  //const [isLoggedIn, setIsLoggedIn] = useState(true);
-  // useEffect(() => {
-  //   // Check if the JWT token is present in localStorage
-  //   const token = localStorage.getItem('Jwt_token');
+  const {logout} = useAuth();
+  const userToken = localStorage.getItem('Jwt_token');
+  const adminToken = localStorage.getItem('admin_token');
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
 
-  //   if (token) {
-  //     // User is logged in
-  //     setIsLoggedIn(true);
-  //   } else {
-  //     // User is not logged in
-  //     setIsLoggedIn(false);
-  //   }
-  // }, []);
+  useEffect(()=>{
+  
+    try {
+      const intervalId = setInterval(() => {
+        const token = localStorage.getItem("Jwt_token");
+        if (token && token !== '') {
+          const decoded = jwtDecode(token);
+          const expiresAt = decoded.exp * 1000;
+          if (Date.now() > expiresAt) {
+            localStorage.removeItem('Jwt_token');
+            // setIsLoggedIn(false);
+            clearInterval(intervalId); // Stop checking after logout
+          }
+        }
+      }, 60000); // Check every minute
+    
+      return () => clearInterval(intervalId); 
+    } catch (error) {
+      console.log(error);
+    }
+  },[])
 
-  //console.log(isLoggedIn);
-  
-  
-  const handleLogout = () => {
+ const handleLogout = () => {
     // Remove the JWT token from localStorage when logging out
+    logout();
     localStorage.removeItem("Jwt_token");
-    localStorage.removeItem("expiration");
+    localStorage.removeItem("admin_token");
+    localStorage.removeItem("LoggedUserEmail")
+    localStorage.removeItem("LoggedUserName")
     //setIsLoggedIn(false);
     // Redirect the user to the login page or any other desired page
     navigate("/login");
@@ -134,8 +149,8 @@ const Header = () => {
       </div>
       <div className="container-fluid position-relative p-0">
         <nav className="navbar navbar-expand-lg navbar-light px-4 px-lg-5 py-3 py-lg-0">
-          <Link href="/" className="navbar-brand p-0">
-                <h1 className="text-primary m-0"><i className="fa fa-map-marker-alt me-3"></i>Destiny Tour</h1>
+          <Link to="/" className="navbar-brand p-0">
+                <h1 className="text-primary m-0"><i className="fa fa-map-marker-alt me-3"></i>Destiny Tours</h1>
             </Link>
             <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                 <span className="fa fa-bars"></span>
@@ -163,23 +178,28 @@ const Header = () => {
                 </Link>
               
                   {/* start */}
-                  {localStorage.getItem("Jwt_token") ? (
+                  {userToken || adminToken ? (
                       <div className="dropdown">
-                      <Link
-                        to="/services"
+                      <label
                         className={`nav-item nav-link dropdown-toggle ${
-                          isLinkActive("/services") ? "active" : ""
+                          isLinkActive("/loggedbooking") || isLinkActive("/viewHotelBookings")  ? "active" : ""
                         }`}
                         id="servicesDropdown"
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
+                        onClick={() => setDropdownOpen(!isDropdownOpen)}
                       >
                         Services
-                      </Link>
-                      <ul className="dropdown-menu" aria-labelledby="servicesDropdown">
+                      </label>
+                      <ul  className={`dropdown-menu ${isDropdownOpen ? 'show' : ''}`} aria-labelledby="servicesDropdown">
                         <li>
-                          <Link to="/bookinglist" className="dropdown-item">
-                            View Booking
+                          <Link to="/loggedbooking" className="dropdown-item"  onClick={() => setDropdownOpen(!isDropdownOpen)}>
+                            View Package Booking
+                          </Link>
+                        </li>
+                        <li>
+                          <Link to="/viewHotelBookings" className="dropdown-item"  onClick={() => setDropdownOpen(!isDropdownOpen)}>
+                            View Hotel Booking
                           </Link>
                         </li>
                       </ul>
@@ -206,6 +226,15 @@ const Header = () => {
                   onClick={handleLinkClick}
                 >
                   Packages
+                </Link>
+                <Link
+                  to="/hotelpage"
+                  className={`nav-item nav-link ${
+                    isLinkActive("/hotelpage") ? "active" : ""
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                 Hotels
                 </Link>
                 <Link
                   to="/destination"
@@ -247,7 +276,7 @@ const Header = () => {
           Login
         </button> */}
         <div>
-                  {localStorage.getItem("Jwt_token") ? (
+                  { userToken || adminToken ?  ( //21-01-2024
                     // Show the logout button if the user is logged in
                     <div>
                       <button

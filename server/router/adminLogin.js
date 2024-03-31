@@ -2,9 +2,10 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 const Admin = require('../model/adminSchema');
+const dotenv = require('dotenv');
  
 const express = require('express');
-
+dotenv.config();
 
 //const mongoose = require('../DB/conn'); // Import mongoose instance
 
@@ -19,9 +20,10 @@ async function loginAdmin(req, res) {
           if (!name || !password) {
             return res.status(400).json({ error: 'Name and password are required' });
           }
-      
+          
           const admin = await Admin.findOne({ name });
-          if (!Admin) {
+          console.log("admin login",admin);
+          if (!admin || password =='')  {
             return res.status(401).json({ error: 'Invalid credentials' });
           }
       
@@ -33,17 +35,17 @@ async function loginAdmin(req, res) {
             return res.status(401).json({ error: 'Invalid credentials' });
           }else{
             console.log("else part ran");
-             const token = jwt.sign({ adminId: Admin._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
-      
+             const token = jwt.sign({ adminId: admin._id }, process.env.SECRET_KEY, { expiresIn: '5h' });
+                // console.log("admin login back",admin._id);
              // sessionStorage.setItem("Jwt_token",token);
-          res.cookie('Jwt_token', {
-            expires: new Date(Date.now() + 2788678676),
-            httpOnly: true,
-            sameSite: 'lax', // Set the SameSite attribute to "Lax"
-          });
+          // res.cookie('Jwt_token', {
+          //   expires: new Date(Date.now() + 2788678676),
+          //   httpOnly: true,
+          //   sameSite: 'lax', // Set the SameSite attribute to "Lax"
+          // });
           console.log("Admin token"+token);
         
-          res.status(200).json({ message: 'Login successful'});
+          res.status(200).json({ message: 'Login successful',token,admin});
           }
       
           

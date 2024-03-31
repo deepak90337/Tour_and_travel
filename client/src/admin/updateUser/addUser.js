@@ -45,7 +45,7 @@ export default function AddUser() {
             console.log('added successfully');
             setShowSuccess(true);
         setTimeout(() => {
-          navigate('/user');
+          navigate('/dashboard');
         }, 1000);
           } else {
             setShowAlert(true);

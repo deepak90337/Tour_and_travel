@@ -14,6 +14,9 @@ app.use(cors());
 
 async function listBooking(req, res) {
 const {email} = req.body;
+if (!email) {
+  return res.status(401).json({ message: 'Booking not found' });
+}
 console.log(email);
 // Find the user in the database
 const booking = await Booking.find({ email });

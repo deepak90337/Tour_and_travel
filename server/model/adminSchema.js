@@ -11,6 +11,10 @@ const adminSchema = new mongoose.Schema({
         type:String,
         required:true
     }, 
+    profile_pic:{
+        type:String,
+        required:false
+    },
     password : {
         type:String,
         required:true
@@ -19,7 +23,7 @@ const adminSchema = new mongoose.Schema({
         type:String,
         required:true
     }
-});
+}, { timestamps: true });
 
 
 adminSchema.pre('save',async function (next) {

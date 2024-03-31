@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 app.use(cors());
 async function userProfile(req, res) {
     const token = req.body.token;
-  console.log("profile token : --"+ token);
+  // console.log("profile token : --"+ token);
 
     if (token == null) {
       console.log("if part ran");
@@ -24,13 +24,24 @@ async function userProfile(req, res) {
       
       const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
       const userId = decodedToken.userId;
-      console.log("else part ran"+decodedToken);
-      console.log(userId);
+      // console.log("decoded token of user"+decodedToken);
+      // console.log(userId);
       const user = await User.findById(userId);
+      if (!user) {
+       return res.status(404).json({ message: 'User not found' });
+      }
+  //url may take pulic/temp   
+  //date:1-01-24
+      const profileData = {
+        name: user.name,
+        email: user.email,
+        profilePic: `http://localhost:5000/temp/${user.profile_pic}` // Construct full URL
+      };
   
-      res.json(user);
+  //1-01-24
+      return res.status(200).json(profileData);
     } catch (error) {
-      res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: 'Unauthorized' });
     }
 
     }

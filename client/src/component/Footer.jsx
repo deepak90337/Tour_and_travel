@@ -42,7 +42,7 @@ const Footer = () => {
               >
                 Contact Us
               </Link>
-              <Link className="btn btn-link" to="" onClick={handleLinkClick}>
+              {/* <Link className="btn btn-link" to="" onClick={handleLinkClick}>
                 Privacy Policy
               </Link>
               <Link className="btn btn-link" to="" onClick={handleLinkClick}>
@@ -50,7 +50,7 @@ const Footer = () => {
               </Link>
               <Link className="btn btn-link" to="" onClick={handleLinkClick}>
                 FAQs & Help
-              </Link>
+              </Link> */}
             </div>
             <div className="col-lg-3 col-md-6">
               <h4 className="text-white mb-3">Contact</h4>

@@ -1,19 +1,23 @@
-import React, { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import React from "react";
+import { Link, useNavigate} from "react-router-dom";
 import Swal from "sweetalert2";
+import axios from 'axios'
+import { useSelector } from 'react-redux';
+import { selectSelectedBooking } from "../redux/booking/packageBookingSlice";
 
 // Import the payment option images
-import googlePayImage from "../payimg/google_pay_image.png";
-import phonePeImage from "../payimg/phone_pe_image.png";
-import paytmImage from "../payimg/paytm_image.png";
-import debitCardImage from "../payimg/debit_card_image.png";
+// import googlePayImage from "../payimg/google_pay_image.png";
+// import phonePeImage from "../payimg/phone_pe_image.png";
+// import paytmImage from "../payimg/paytm_image.png";
+// import debitCardImage from "../payimg/debit_card_image.png";
 
 const PaymentComponent = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation();
+  const selectedBooking = useSelector(selectSelectedBooking);
   
   // State to manage the selected payment option and visibility of debit card form
-  const [selectedOption, setSelectedOption] = useState("Google Pay");
+  // const [selectedOption, setSelectedOption] = useState("Google Pay");
   
   // Function to handle the "Back" button click
   const handleGoBack = () => {
@@ -22,14 +26,92 @@ const PaymentComponent = () => {
 
   // Function to handle the change in payment options
   
-  const searchParams = new URLSearchParams(location.search);
-  const packageName = searchParams.get("packageName");
-  const packagePrice = searchParams.get("packagePrice");
-  const flightNumber = searchParams.get("flightNumber");
-  const arrivalTime = searchParams.get("arrivalTime");
-  const departureTime = searchParams.get("departureTime");
+  // const searchParams = new URLSearchParams(location.search);
+  // const bid = sessionStorage.getItem("bid") || selectedBooking?._id || "N/A";
+  // const packageName = searchParams.get("packageName") || selectedBooking?.selectedDestination ||"N/A";
+  // const packagePrice = searchParams.get("packagePrice") || selectedBooking?.price ||"N/A";
+  // const flightNumber = searchParams.get("flightNumber") || selectedBooking?.flight ||"N/A";
+  // const arrivalTime = searchParams.get("arrivalTime") || selectedBooking?.atime ||"N/A";
+  // const departureTime = searchParams.get("departureTime") || selectedBooking?.dtime ||"N/A";
+
+   const bid = selectedBooking?._id || "N/A";
+  const packageName = selectedBooking?.selectedDestination ||"N/A";
+  const packagePrice =  selectedBooking?.price ||"N/A";
+  const flightNumber =  selectedBooking?.flight ||"N/A";
+  const arrivalTime = selectedBooking?.atime ||"N/A";
+  const departureTime = selectedBooking?.dtime ||"N/A";
+console.log("payment comp",bid);
+  const checkOuthandler=async (amount)=>{
+    const {data:{key}}=await axios.get("http://localhost:5000/api/getrazorkey")
+    const {data:{order}}=await axios.post("http://localhost:5000/api/checkout",{amount})
+    console.log("payment comp.",order);
+    const options={
+      key,
+      "amount":order.amount,
+      "currency":"INR",
+      "name":"DestinyTours",
+     " description":"Payment",
+      "receipt":"test1dsfcv4",
+      "order_id":order.id,
+      // callback_url:"http://localhost:5000/api/paymentverification",
+      "handler": async (response)=>{
+
+          const body = {
+            ...response,
+            email:localStorage.getItem("LoggedUserEmail"),
+            b_id:bid
+          }
+       
+           const validateResponse = await fetch("http://localhost:5000/api/paymentverification",{
+              method:"POST",
+              body:JSON.stringify(body),
+              headers:{
+                "content-type":"application/json"
+              }
+            })
+            const jsonRes = await validateResponse.json();
+            console.log(jsonRes.razorpay_order_id);
+
+            if(validateResponse.status === 200){
+              const emailBody = {
+                userName:localStorage.getItem("LoggedUserName"),
+                userEmail:localStorage.getItem("LoggedUserEmail"),
+                subject:"Payment Details",
+                message:`Package Booking order_id=${jsonRes.razorpay_order_id}`
+              }
+              const emailRes = await fetch("http://localhost:5000/payments/payment-email",{
+                method:"POST",
+              body:JSON.stringify(emailBody),
+              headers:{
+                "content-type":"application/json"
+              }
+              })
+
+              if(emailRes.status === 200){
+              navigate(`/paymentsuccess?order_id=${jsonRes.razorpay_order_id}`)}
+            }
+            if(validateResponse.status === 400){
+             alert("some problem occured");
+            }
+      },
+      "prefill":{
+        "name":"abc",
+        "email":"abc@gmail.com",
+        "contact":"7990890337"
+      },
+      "notes":{
+        "address":"razorpay official"
+      },
+      "theme":{
+       "color":"#334967"
+      }
+    };
+    const razor = new window.Razorpay(options);
+      razor.open();
+  }
   
-  const handlePaymentConfirmation = () => {
+  const handlePaymentConfirmation = (e) => {
+    e.preventDefault();
     Swal.fire({
       title: "Confirm Payment",
       text: "Are you sure you want to proceed with the payment?",
@@ -41,13 +123,14 @@ const PaymentComponent = () => {
       cancelButtonText: "Cancel",
     }).then((result) => {
       if (result.isConfirmed) {
-        navigate("/");
+        
+      checkOuthandler(packagePrice);
         // Payment confirmed
-        Swal.fire({
-          title: "Payment Successful",
-          text: "Your payment has been processed successfully!",
-          icon: "success",
-        });
+        // Swal.fire({
+        //   title: "Payment Successful",
+        //   text: "Your payment has been processed successfully!",
+        //   icon: "success",
+        // });
         // You can redirect to a success page or perform other actions here
       } else {
         // Payment canceled
@@ -62,185 +145,185 @@ const PaymentComponent = () => {
   
   // Function to handle input change and update formData
   
-  const [gpayFormData, setGpayFormData] = useState({
-    upiId: "",
-  });
+  // const [gpayFormData, setGpayFormData] = useState({
+  //   upiId: "",
+  // });
 
-  const [phonePeFormData, setPhonePeFormData] = useState({
-    upiId: "",
-  });
+  // const [phonePeFormData, setPhonePeFormData] = useState({
+  //   upiId: "",
+  // });
 
-  const [paytmFormData, setPaytmFormData] = useState({
-    upiId: "",
-  });
+  // const [paytmFormData, setPaytmFormData] = useState({
+  //   upiId: "",
+  // });
 
-  const [debitCardFormData, setDebitCardFormData] = useState({
-    debitCardNumber: "",
-    debitCardExpiryDate: "",
-    debitCardCvv: "",
-    debitCardholderName: "",
-  });
+  // const [debitCardFormData, setDebitCardFormData] = useState({
+  //   debitCardNumber: "",
+  //   debitCardExpiryDate: "",
+  //   debitCardCvv: "",
+  //   debitCardholderName: "",
+  // });
 
-  const [gpayErrors, setGpayErrors] = useState({
-    upiId: "",
-  });
+  // const [gpayErrors, setGpayErrors] = useState({
+  //   upiId: "",
+  // });
 
-  const [phonePeErrors, setPhonePeErrors] = useState({
-    upiId: "",
-  });
+  // const [phonePeErrors, setPhonePeErrors] = useState({
+  //   upiId: "",
+  // });
 
-  const [paytmErrors, setPaytmErrors] = useState({
-    upiId: "",
-  });
+  // const [paytmErrors, setPaytmErrors] = useState({
+  //   upiId: "",
+  // });
 
-  const [debitCardErrors, setDebitCardErrors] = useState({
-    debitCardNumber: "",
-    debitCardExpiryDate: "",
-    debitCardCvv: "",
-    debitCardholderName: "",
-  });
+  // const [debitCardErrors, setDebitCardErrors] = useState({
+  //   debitCardNumber: "",
+  //   debitCardExpiryDate: "",
+  //   debitCardCvv: "",
+  //   debitCardholderName: "",
+  // });
 
-  // Function to handle payment option change
-  const handlePaymentOptionChange = (e) => {
-    setSelectedOption(e.target.value);
-    resetFormAndErrors();
-  };
+  // // Function to handle payment option change
+  // const handlePaymentOptionChange = (e) => {
+  //   setSelectedOption(e.target.value);
+  //   resetFormAndErrors();
+  // };
 
   // Function to reset form data and errors for each option
-  const resetFormAndErrors = () => {
-    setGpayFormData({ upiId: "" });
-    setPhonePeFormData({ upiId: "" });
-    setPaytmFormData({ upiId: "" });
-    setDebitCardFormData({
-      debitCardNumber: "",
-      debitCardExpiryDate: "",
-      debitCardCvv: "",
-      debitCardholderName: "",
-    });
-    setGpayErrors({ upiId: "" });
-    setPhonePeErrors({ upiId: "" });
-    setPaytmErrors({ upiId: "" });
-    setDebitCardErrors({
-      debitCardNumber: "",
-      debitCardExpiryDate: "",
-      debitCardCvv: "",
-      debitCardholderName: "",
-    });
-  };
+  // const resetFormAndErrors = () => {
+  //   setGpayFormData({ upiId: "" });
+  //   setPhonePeFormData({ upiId: "" });
+  //   setPaytmFormData({ upiId: "" });
+  //   setDebitCardFormData({
+  //     debitCardNumber: "",
+  //     debitCardExpiryDate: "",
+  //     debitCardCvv: "",
+  //     debitCardholderName: "",
+  //   });
+  //   setGpayErrors({ upiId: "" });
+  //   setPhonePeErrors({ upiId: "" });
+  //   setPaytmErrors({ upiId: "" });
+  //   setDebitCardErrors({
+  //     debitCardNumber: "",
+  //     debitCardExpiryDate: "",
+  //     debitCardCvv: "",
+  //     debitCardholderName: "",
+  //   });
+  // };
 
   // Function to handle form submission
 
   // Function to validate form fields
-  const validateForm = () => {
-    let valid = true;
-    const newErrors = {};
+  // const validateForm = () => {
+  //   let valid = true;
+  //   const newErrors = {};
 
-    if (selectedOption === "Google Pay") {
-      if (gpayFormData.upiId.trim() === "") {
-        newErrors.upiId = "UPI Id is required";
-        valid = false;
-      } else if (!/\S+@\S+/.test(gpayFormData.upiId)) {
-        newErrors.upiId = "Invalid UPI ID format";
-        valid = false;
-      }else {
-        newErrors.upiId = "";
-      }
-      setGpayErrors(newErrors);
-    }
-     else if (selectedOption === "PhonePe") {
-      if (phonePeFormData.upiId.trim() === "") {
-        newErrors.upiId = "UPI Id is required";
-        valid = false;
-      } else if (!/\S+@\S+/.test(phonePeFormData.upiId)) {
-        newErrors.upiId = "Invalid UPI ID format";
-        valid = false;
-      }else {
-        newErrors.upiId = "";
-      }
-      setPhonePeErrors(newErrors);
-    }
-     else if (selectedOption === "Paytm") {
-      if (paytmFormData.upiId.trim() === "") {
-        newErrors.upiId = "Invalid UPI ID format";
-        valid = false;
-      } else if (!/\S+@\S+/.test(paytmFormData.upiId)) {
-        newErrors.upiId = "Invalid Username format";
-        valid = false;
-      } else {
-        newErrors.upiId = "";
-      }
-      setPaytmErrors(newErrors);
-    }
-     else if (selectedOption === "Debit Card") {
-      if (debitCardFormData.debitCardNumber.trim() === "") {
-        newErrors.debitCardNumber = "Debit Card Number is required";
-        valid = false;
-      } else {
-        newErrors.debitCardNumber = "";
-      }
-      setDebitCardErrors(newErrors);
-      if (debitCardFormData.debitCardExpiryDate.trim() === "") {
-        newErrors.debitCardExpiryDate = "Debit Card Expiry Date is required";
-        valid = false;
-      } else {
-        newErrors.debitCardExpiryDate = "";
-      }
-      setDebitCardErrors(newErrors);
-      if (debitCardFormData.debitCardCvv.trim() === "") {
-        newErrors.debitCardCvv = "Debit Card CVV Number is required";
-        valid = false;
-      } else {
-        newErrors.debitCardCvv = "";
-      }
-      setDebitCardErrors(newErrors);
-      if (debitCardFormData.debitCardholderName.trim() === "") {
-        newErrors.debitCardholderName = "Debit Card holder Namer is required";
-        valid = false;
-      } else {
-        newErrors.debitCardholderName = "";
-      }
-      setDebitCardErrors(newErrors);
-    }
+  //   if (selectedOption === "Google Pay") {
+  //     if (gpayFormData.upiId.trim() === "") {
+  //       newErrors.upiId = "UPI Id is required";
+  //       valid = false;
+  //     } else if (!/\S+@\S+/.test(gpayFormData.upiId)) {
+  //       newErrors.upiId = "Invalid UPI ID format";
+  //       valid = false;
+  //     }else {
+  //       newErrors.upiId = "";
+  //     }
+  //     setGpayErrors(newErrors);
+  //   }
+  //    else if (selectedOption === "PhonePe") {
+  //     if (phonePeFormData.upiId.trim() === "") {
+  //       newErrors.upiId = "UPI Id is required";
+  //       valid = false;
+  //     } else if (!/\S+@\S+/.test(phonePeFormData.upiId)) {
+  //       newErrors.upiId = "Invalid UPI ID format";
+  //       valid = false;
+  //     }else {
+  //       newErrors.upiId = "";
+  //     }
+  //     setPhonePeErrors(newErrors);
+  //   }
+  //    else if (selectedOption === "Paytm") {
+  //     if (paytmFormData.upiId.trim() === "") {
+  //       newErrors.upiId = "Invalid UPI ID format";
+  //       valid = false;
+  //     } else if (!/\S+@\S+/.test(paytmFormData.upiId)) {
+  //       newErrors.upiId = "Invalid Username format";
+  //       valid = false;
+  //     } else {
+  //       newErrors.upiId = "";
+  //     }
+  //     setPaytmErrors(newErrors);
+  //   }
+  //    else if (selectedOption === "Debit Card") {
+  //     if (debitCardFormData.debitCardNumber.trim() === "") {
+  //       newErrors.debitCardNumber = "Debit Card Number is required";
+  //       valid = false;
+  //     } else {
+  //       newErrors.debitCardNumber = "";
+  //     }
+  //     setDebitCardErrors(newErrors);
+  //     if (debitCardFormData.debitCardExpiryDate.trim() === "") {
+  //       newErrors.debitCardExpiryDate = "Debit Card Expiry Date is required";
+  //       valid = false;
+  //     } else {
+  //       newErrors.debitCardExpiryDate = "";
+  //     }
+  //     setDebitCardErrors(newErrors);
+  //     if (debitCardFormData.debitCardCvv.trim() === "") {
+  //       newErrors.debitCardCvv = "Debit Card CVV Number is required";
+  //       valid = false;
+  //     } else {
+  //       newErrors.debitCardCvv = "";
+  //     }
+  //     setDebitCardErrors(newErrors);
+  //     if (debitCardFormData.debitCardholderName.trim() === "") {
+  //       newErrors.debitCardholderName = "Debit Card holder Namer is required";
+  //       valid = false;
+  //     } else {
+  //       newErrors.debitCardholderName = "";
+  //     }
+  //     setDebitCardErrors(newErrors);
+  //   }
     
 
-    return valid;
-  };
+  //   return valid;
+  // };
 
-  const handleInputChange = (e) => {
-    const { id, value } = e.target;
+  // const handleInputChange = (e) => {
+  //   const { id, value } = e.target;
 
-    if (selectedOption === "Google Pay") {
-      setGpayFormData((prevData) => ({
-        ...prevData,
-        [id]: value,
-      }));
-    } else if (selectedOption === "PhonePe") {
-      setPhonePeFormData((prevData) => ({
-        ...prevData,
-        [id]: value,
-      }));
-    } else if (selectedOption === "Paytm") {
-      setPaytmFormData((prevData) => ({
-        ...prevData,
-        [id]: value,
-      }));
-    } else if (selectedOption === "Debit Card") {
-      setDebitCardFormData((prevData) => ({
-        ...prevData,
-        [id]: value,
-      }));
-    }
+  //   if (selectedOption === "Google Pay") {
+  //     setGpayFormData((prevData) => ({
+  //       ...prevData,
+  //       [id]: value,
+  //     }));
+  //   } else if (selectedOption === "PhonePe") {
+  //     setPhonePeFormData((prevData) => ({
+  //       ...prevData,
+  //       [id]: value,
+  //     }));
+  //   } else if (selectedOption === "Paytm") {
+  //     setPaytmFormData((prevData) => ({
+  //       ...prevData,
+  //       [id]: value,
+  //     }));
+  //   } else if (selectedOption === "Debit Card") {
+  //     setDebitCardFormData((prevData) => ({
+  //       ...prevData,
+  //       [id]: value,
+  //     }));
+  //   }
 
-    validateForm(); // You don't need to pass id and value here
-  };
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Validate form fields and perform registration logic
-    if (validateForm()) {
-      handlePaymentConfirmation();
-      window.scrollTo(0, 0);
-    }
-  };
+  //   validateForm(); // You don't need to pass id and value here
+  // };
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   // Validate form fields and perform registration logic
+  //   if (validateForm()) {
+  //     handlePaymentConfirmation();
+  //     window.scrollTo(0, 0);
+  //   }
+  // };
 
   return (
     <div className="container-fluid bg-primary py-5 mb-5 hero-header">
@@ -255,16 +338,16 @@ const PaymentComponent = () => {
                                     <li className="breadcrumb-item text-white active" aria-current="page">Payment</li>
                                 </ol>
                             </nav>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handlePaymentConfirmation}>
               <div className="row g-3">
                 <div className="col-md-12">
                   <div className="form-group">
-                    <label htmlFor="paymentOptions" className="text-white mb-3">
+                    {/* <label htmlFor="paymentOptions" className="text-white mb-3">
                       Select Payment Option:
-                    </label>
+                    </label> */}
                     <div className="d-flex align-items-center">
                       {/* Google Pay */}
-                      <div className="form-check me-4">
+                      {/* <div className="form-check me-4">
                         <input
                           type="radio"
                           className="form-check-input"
@@ -302,10 +385,10 @@ const PaymentComponent = () => {
                             </div>
                           </div>
                         )}
-                      </div>
+                      </div> */}
 
                       {/* PhonePe */}
-                      <div className="form-check me-4">
+                      {/* <div className="form-check me-4">
                         <input
                           type="radio"
                           className="form-check-input"
@@ -342,10 +425,10 @@ const PaymentComponent = () => {
                             </div>
                           </div>
                         )}
-                      </div>
+                      </div> */}
 
                       {/* Paytm */}
-                      <div className="form-check me-4">
+                      {/* <div className="form-check me-4">
                         <input
                           type="radio"
                           className="form-check-input"
@@ -382,11 +465,11 @@ const PaymentComponent = () => {
                             </div>
                           </div>
                         )}
-                      </div>
+                      </div> */}
 
                       {/* Debit Card */}
                       
-                      <div className="form-check me-4">
+                      {/* <div className="form-check me-4">
                         <input
                           type="radio"
                           className="form-check-input"
@@ -403,11 +486,11 @@ const PaymentComponent = () => {
                             className="img-fluid"
                           />
                         </label>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </div>
-                {selectedOption === "Debit Card" && (
+                {/* {selectedOption === "Debit Card" && (
                     <>
                     <div className="col-md-12">
                       <div className="form-floating">
@@ -488,7 +571,7 @@ const PaymentComponent = () => {
                       </div>
                     </div>
                     </>
-                    )}
+                    )} */}
 
                 <div className="col-md-12">
                   <div className="form-floating">

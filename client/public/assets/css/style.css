@@ -277,16 +277,53 @@
     transform: scale(1.1);
 }
 
+/*** Admin add Package ***/
+/* #date1{
+    background-color: #dc3545;
+} */
+
+.package_book_date{
+    margin: 20px 0px 20px 0px;
+}
+
+.pack_time_container{
+    display: flex;
+    justify-content: space-between ;
+   flex-wrap: wrap;
+    margin: 20px 0px 20px 0px;
+}
+.pack_time{
+  flex: 1 0 100px; /* Grow as needed, don't shrink below 300px */
+  min-width: 300px;
+}
+
 
 /*** Booking ***/
 .booking {
-    background: linear-gradient(rgba(15, 23, 43, .7), rgba(15, 23, 43, .7)), url(../img/booking.jpg);
+    background: linear-gradient(rgba(15, 23, 43, .7), rgba(15, 23, 43, .7)), url(../Hotel_img/hotel_back.jpg);
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;
 }
 
+.hotelbooking {
+    background: linear-gradient(rgba(15, 23, 43, .7), rgba(15, 23, 43, .7)), url(../Hotel_img/hotel_back.jpg);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+/* Text */
 
+.text-black{
+    color: black;
+}
+
+/***contact***/
+.invalid-input {
+    color: #dc3545;
+    font-size: 15px;
+    margin-top: 5px;
+}
 /***Payment***/
 .is-invalid {
     border-color: #dc3545;
@@ -332,6 +369,199 @@
     border: 2px solid #fff; /* Add a white border */
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5); /* Add a shadow effect */
   }
+/* Admin Nav */
+
+.custom-navbar {
+    height: 60px;
+    position: relative;
+  }
+  
+  .custom-navbar-brand{
+    color: #000014;
+  }
+  .custom-nav-link {
+    position: relative;
+    color: white;
+    text-decoration: none;
+    padding: 5px 20px;
+ 
+  }
+  
+  .custom-nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: white;
+    transition: width 0.3s ease;
+  }
+  
+  .custom-nav-link:hover::after {
+    width: 100%;
+  }
+  
+  .custom-nav-link.active::after {
+    width: 100%;
+  }
+  
+  .custom-nav-link-hover:hover {
+    color: #ffc107; /* Change color when hovered */
+  }
+
+  .pay-menu{
+    margin-bottom: 1px;
+  }
+  @media (max-width: 735px) {
+    .custom-navbar {
+      height: 300px; /* Adjust the height as needed */
+    }
+  }
+
+
+/***user List***/
+.pagination_controls{
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0px 20px 0px;
+}
+
+.usertable{
+    /* border-bottom: 2px solid #000014; */
+    /* border-top: 2px solid #000014; */
+    height: 400px;
+    width: calc(100% - 60px);
+    margin: 0px 30px 0px 30px;
+    overflow-y: scroll;
+
+}
+
+.search-field{
+    display: flex;
+    justify-content: space-between;
+}
+
+.table-Heading{
+    display: flex;
+    justify-content: space-around;
+}
+
+/* .table-btn{
+    border-top: 2px solid black;
+} */
+
+.table-Heading .h-2{
+    /* justify-content: center; */
+    padding: 0px 0px 0px 80px;
+}
+
+.table-Heading .h-3{
+    /* justify-content: center; */
+    padding: 0px 130px 0px 0px;
+}
+
+.table-Heading .h-4{
+    /* justify-content: center; */
+    padding: 0px 70px 0px 0px;
+}
+
+.export-cont{
+    display: flex;
+    align-items: center;
+} 
+
+/* #75A529 (adjacent green with more blue)
+#85B505 (adjacent green with more yellow)
+#75A53B (two shades darker blue-green)
+#85B51D (two shades lighter yellow-green) */
+
+.export-btn{
+    border-radius: 7px;
+    background-color: #75A529
+}
+
+
+
+.usertable .table ul tr{
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.usertable .table ul tr .user-detail{
+   width: 220px;
+   overflow-x: hidden;
+}
+
+.usertable .table ul tr .user-detail .user-email{
+    width: fit-content;
+}
+
+.usertable .table ul tr div{
+    display: flex;
+    justify-content: center;
+}
+/**For setting no. of records **/
+.pagination_num select{
+    background-color: #86B817;
+    color: #000014;
+    border-radius: 5px;
+    width: 50px;
+}
+
+.pagination_num label{
+    color: #000014;
+    margin-right:5px ;
+}
+
+.pagination_nav{
+    width:130px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.pagination_nav button:hover{
+    background-color: #ddd;
+    color: black;
+}
+.pagination_nav .previous{
+    background-color: #f1f1f1;
+    color: black;
+    border: none;
+}
+
+.pagination_nav .next{
+    background-color: #04AA6D;
+    color: white;
+    border: none;
+}
+/* package-dashboard */
+.package-table-Heading{
+    display: flex;
+    justify-content: space-around;
+    margin-right: 78px;
+    color: #030611e4;
+}
+
+/* user-dashboard */
+.dashboard-container{
+    display: flex;
+    height: 100vh;
+    /* justify-content: center; */
+}
+
+.admin-nav{
+    height: 100vh;
+}
+
+.admin-nav-cont{
+    /* height: calc(100vh - 20px); */
+    display: flex;
+    align-content: space-between;
+    flex-direction: column;
+    bottom: 0;
+}
 
 /*** Team ***/
 .team-item {
@@ -359,6 +589,49 @@
 }
 
 
+/** EditProfile Component **/
+.edit-profile-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 15px;
+    margin-right: 25px;
+    background-size: cover;
+    background-position: center;
+    background-color: #ccc;
+    border: 2px solid #fff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);}
+
+    /* .btn-check:focus+.btn-primary, .btn-primary:hover {
+        background: rgb(0, 0, 0);
+
+    } */
+
+.add_booking:hover, .export-btn:hover{
+    background: rgba(39, 3, 3, 0.571);
+}
+.profile-image-container{
+    display: flex;
+    justify-content: center;
+}
+
+.profile-image-label{
+    display: flex;
+    justify-content: center;
+    max-width: 550px;
+    margin: 0px 0px 0px 40px;
+}
+
+.profile-image-label i{
+    color: #000014;
+    font-size: 30px !important;
+    opacity: 40%;
+    margin-top: 105px;
+    position: absolute;
+    margin-left: 133px;
+    margin-right: 40px;
+    cursor: pointer;
+  }
+  
 
 
 /*** Footer ***/

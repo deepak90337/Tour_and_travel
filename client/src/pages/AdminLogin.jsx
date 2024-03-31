@@ -1,5 +1,6 @@
 import React, { useState,useEffect} from "react";
 import { Link ,useNavigate } from "react-router-dom";
+import { useAuth } from "../context/userAuthContext";
 
 
 const AdminLogin= () => {
@@ -9,6 +10,7 @@ const AdminLogin= () => {
     const [showAlerts, setShowAlerts] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const {setUser} = useAuth();
     //const [cookieValue,setCookieValue] = useCookies('Jwt_token');
     const navigate = useNavigate();
     
@@ -49,15 +51,23 @@ const AdminLogin= () => {
           body: JSON.stringify(formData),
         });
   
-      
+        const data = await response.json();
+        const {token,admin} = data;
+        setUser(admin);
+        if  (response.status === 400) {
+          console.log('Missing Fields');
+          setShowAlert(true);
+        }
         if (response.status === 200) {
           console.log('Login successful');
+          localStorage.setItem('admin_token',token);
+          localStorage.removeItem("Jwt_token");
+          setShowAlert(false);
           setShowSuccess(true);
           setIsLoggedIn(true);
           //setCookieValue(response.token);
-          console.log(response.token);
         setTimeout(() => {
-          navigate('/user');
+          navigate('/dashboard');
           if (isLoggedIn) {
             navigate('/');
           }
@@ -198,11 +208,11 @@ const AdminLogin= () => {
                   <button className="btn btn-primary btn-lg"  type="submit" >
                     Login Now
                   </button>
-                  <p className="text-center mt-3 mb-0">
+                  {/* <p className="text-center mt-3 mb-0">
                     Don't have an account yet?{" "}
                     <Link to={"/adminregister"}>Register here</Link>
                   </p>
-                  <p className="text-center mt-1 mb-0">OR</p>
+                  <p className="text-center mt-1 mb-0">OR</p> */}
                   <p className="text-center mt-1 mb-0" >Go to the <Link to="/">Home Page</Link></p>
                   </div>
               </div>

@@ -1,5 +1,6 @@
-import React, { useState,useEffect} from "react";
+import React, {useState} from "react";
 import { Link ,useNavigate } from "react-router-dom";
+import { useAuth } from "../context/userAuthContext";
 //import { useCookies } from 'react-cookie';
 //import Cookies from "js-cookie";
 //import { Alert } from "react-bootstrap";
@@ -12,19 +13,10 @@ const LoginComponent = () => {
     const [showAlerts, setShowAlerts] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const {setUser} = useAuth();
     //const [cookieValue,setCookieValue] = useCookies('Jwt_token');
     const navigate = useNavigate();
    
-    useEffect(() => {
-      // Get the value of a specific cookie
-     
-      console.log('logincomponent');
-      // You can then use the cookie value as needed in your component
-      // For example, set it to a state variable or use it in some logic
-    }, []);
-  
-   
-
     const [formData, setFormData] = useState({
       name: "",
       password: "",
@@ -53,20 +45,31 @@ const LoginComponent = () => {
         });
   
       const data = await response.json();
-       const { token } = data;
+       const { token,user } = data;
        //const data1 = { key: 'value' };
-       const expiration = new Date().getTime() + 24 * 3600 * 1000; // Set to expire in 1 hour (adjust as needed)
-       localStorage.setItem('expiration', expiration );
-       
+      //  const expiration = new Date().getTime() + 24 * 3600 * 1000; // Set to expire in 1 hour (adjust as needed)
+      //  localStorage.setItem('expiration', expiration );
        // Store the JWT token in localStorage or sessionStorage
+       setUser(user);
        localStorage.setItem('Jwt_token', token);
+       localStorage.removeItem('LoggedUserName');
+       localStorage.removeItem('LoggedUserEmail')
+       localStorage.setItem('LoggedUserName',user?.name);
+       localStorage.setItem('LoggedUserEmail',user?.email);
+       if  (response.status === 401) {
+        console.log('Invalid credentials');
+        setShowAlert(true);
+      }
         
         if (response.status === 200) {
           console.log('Login successful');
+          localStorage.removeItem("admin_token");
+          localStorage.removeItem("admin-pic");
+          setShowAlert(false);
           setShowSuccess(true);
           setIsLoggedIn(true);
           //setCookieValue(response.token);
-          console.log(response.token);
+          // console.log(response.token);
         setTimeout(() => {
           navigate('/');
           if (isLoggedIn) {
@@ -74,10 +77,8 @@ const LoginComponent = () => {
           }
         }, 1000);   
           // Redirect to home page on success
-        } else if  (response.status === 401) {
-          console.log('Invalid credentials');
-          setShowAlert(true);
-        }
+        } 
+       
         else if(response.status === 500){
           setShowAlerts(true);
         }
@@ -86,7 +87,10 @@ const LoginComponent = () => {
       }
     };
   
-
+    // useEffect(()=>{
+    //   console.log("login comp",userd);
+    // },)
+  
 
     const handleInputChange = (e) => {
       const { name, value } = e.target;
@@ -203,6 +207,7 @@ const LoginComponent = () => {
                 </div>
                 <div className="col-md-8 mx-auto">
                 <div className="d-grid gap-2">
+                {/* onClick={()=>setUser({name:userd?.name,email:userd?.email})} */}
                   <button className="btn btn-primary btn-lg"  type="submit" >
                     Login Now
                   </button>

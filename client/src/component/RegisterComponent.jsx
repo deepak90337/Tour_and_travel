@@ -66,9 +66,15 @@ const RegisterComponent = () => {
         body: JSON.stringify(formData),
       });
 
+      if (response.status === 409) {
+        setShowAlert(true);
+        alert("Username Taken");
+           }
+
       if (response.status === 200) {
         console.log('Registration successful');
         setShowSuccess(true);
+        setShowAlert(false);
         setTimeout(() => {
           navigate('/login');
         }, 1000);      
@@ -186,7 +192,7 @@ const RegisterComponent = () => {
                       <div className="invalid-feedback mb-4">{errors.name}</div>
                     )}
 
-                    <label htmlFor="name">Your Name</label>
+                    <label htmlFor="name">Your Userame</label>
                   </div>
                 </div>
                 <div className="col-md-12">

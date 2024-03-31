@@ -49,7 +49,7 @@ const UserUpdate = () => {
       setUser(updatedUser);
       setShowSuccess(true);
         setTimeout(() => {
-          navigate('/user');
+          navigate('/dashboard');
         }, 1000);
     } catch (error) {
       if (error.response.status === 400) {

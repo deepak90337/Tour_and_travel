@@ -5,16 +5,23 @@ import PackageComponent from "../component/PackageComponent";
 import ServiceComponent from "../component/ServiceComponent";
 import ProcessComponent from "../component/ProcessComponent";
 import DestinationComponent from "../component/DestinationComponent";
+import { useAuth } from "../context/userAuthContext";
+// import { useSelector } from "react-redux";
 
 const Home = () => {
   const [loading, setLoading] = useState(true);
-
+  const {user} = useAuth();
+    // const   {hotelBookings}  = useSelector((state) => state.hotelbookings); 
+    // const lastBookingId = hotelBookings.length > 0 ? hotelBookings[hotelBookings.length - 1]._id : null;
+// Assuming your slice name is "hotelBookings"
+  //  console.log(JSON.stringify(lastBookingId))
   useEffect(() => {
     // Simulate loading for 2 seconds, replace with your actual loading logic
     setTimeout(() => {
       setLoading(false);
     }, 200);
-  }, []);
+  }, );
+
 
   return (
     <>
@@ -46,8 +53,7 @@ const Home = () => {
                     Enjoy Your Vacation With Us
                   </h1>
                   <p className="fs-4 text-white mb-4 animated slideInDown">
-                    Welcome to Our Destiny Tour Site - where your journey to
-                    uncover the wonders of the world begins.
+                    Welcome to Our Destiny Tour Site.
                   </p>
                 </div>
               </div>
@@ -55,6 +61,35 @@ const Home = () => {
           </div>
         </div>
       )}
+        {/* <h2>Bookings</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Hotel</th>
+            <th>Date</th> */}
+            {/* Other booking details */}
+          {/* </tr>
+        </thead>
+            <tbody> */}
+            {/* {hotelBookings.length > 0 ? (
+              hotelBookings.map((booking) => (
+                <tr key={booking._id}>
+                  <td>{booking._id}</td>
+                  <td>{booking.hotel_name}</td>
+                  <td>{booking.date1}</td>
+                  {/* Display other booking details */}
+                {/* </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4">No bookings found.</td>
+              </tr>
+            )} */}
+          {/* </tbody>
+
+      
+      </table> */}
       <AboutComponent />
 
       <ServiceComponent />
@@ -63,7 +98,8 @@ const Home = () => {
 
       <PackageComponent />
 
-      <BookingComponent />
+        {user && (<BookingComponent />)}
+      
 
       <ProcessComponent />
     </>

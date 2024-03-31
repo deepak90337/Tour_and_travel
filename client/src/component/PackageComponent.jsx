@@ -29,9 +29,7 @@ const navigate = useNavigate();
         }
       });
           // navigate('/login?m=Login to book a package');
-    }
-   
-  };
+    } };
   return (
     <>
       <div className="container-xxl py-5">
@@ -40,7 +38,7 @@ const navigate = useNavigate();
             <h6 className="section-title bg-white text-center text-primary px-3">
               Packages
             </h6>
-            <h1 className="mb-5">Awesome Packages</h1>
+            <h1 className="mb-5">Awesome Packages</h1> 
           </div>
           <div className="row g-4 justify-content-center">
             <div

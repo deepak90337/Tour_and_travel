@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useDispatch } from 'react-redux';
+import { setSelectedBooking } from '../redux/booking/packageBookingSlice';
 
 const BookingComponent = () => {
   const [selectedDestination, setSelectedDestination] = useState("select");
@@ -9,23 +11,31 @@ const BookingComponent = () => {
   // const [flightNumber, setFlightNumber] = useState("");
   // const [arrivalTime, setArrivalTime] = useState("");
   // const [departureTime, setDepartureTime] = useState("");
-
+  const dispatch = useDispatch();
+   const uname = localStorage.getItem('LoggedUserName');
+   const uemail = localStorage.getItem('LoggedUserEmail');
+  // console.log("Logged",name,email);
   const location = useLocation();
+  
   const navigate = useNavigate();
 
+  const searchParams = new URLSearchParams(location.search);
+  const destination = searchParams.get("destination");
+
+
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
+    name: uname || "",
+    email: uemail || "",
     date1: "",
-    flight: "",
+    flight:  "",
     atime: "",
     dtime: "",
-    selectedDestination: "",
+    selectedDestination: destination ||"",
     price: "",
   });
-  useEffect(() => {
-    console.log(formData);
-  }, [formData]);
+  // useEffect(() => {
+  //   console.log(formData);
+  // }, [formData]);
 
   const [errors, setErrors] = useState({
     name: "",
@@ -65,7 +75,11 @@ const BookingComponent = () => {
 
       if (response.status === 200) {
         console.log("Booking successful");
+        setShowAlert(false);
         setShowSuccess(true);
+        const data = await response.json();
+        dispatch(setSelectedBooking(data));
+        sessionStorage.setItem("bid",data?._id);
         setTimeout(() => {
           navigateToPayment();
         }, 1000);
@@ -109,23 +123,25 @@ const BookingComponent = () => {
   // };
 
   const navigateToPayment = () => {
-    const { name, email, date1, flight, atime, dtime } = formData;
+    // const {name, email, date1, flight, atime, dtime } = formData;
 
-    // Build the search query string for the payment page
-    const queryString = `?packageName=${encodeURIComponent(
-      selectedPackage.name
-    )}&packagePrice=${encodeURIComponent(
-      selectedPackage.price
-    )}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(
-      email
-    )}&datetime=${encodeURIComponent(date1)}&flightNumber=${encodeURIComponent(
-      flight
-    )}&arrivalTime=${encodeURIComponent(
-      atime
-    )}&departureTime=${encodeURIComponent(dtime)}`;
+    // // Build the search query string for the payment page
+    // const queryString = `?packageName=${encodeURIComponent(
+    //   selectedPackage.name
+    // )}&packagePrice=${encodeURIComponent(
+    //   selectedPackage.price
+    // )}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(
+    //   email
+    // )}&datetime=${encodeURIComponent(date1)}&flightNumber=${encodeURIComponent(
+    //   flight
+    // )}&arrivalTime=${encodeURIComponent(
+    //   atime
+    // )}&departureTime=${encodeURIComponent(
+    //   dtime
+    // )}`;
 
     // Navigate to the payment page with the query string
-    navigate(`/payment${queryString}`);
+    navigate(`/payment`);
   };
 
   const validateForm = () => {
@@ -330,6 +346,7 @@ const BookingComponent = () => {
                           placeholder="Your Name"
                           value={formData.name}
                           onChange={handleInputChange}
+                          readOnly
                         />
                           <label htmlFor="name" >Your Name</label>
                         {errors.name && (
@@ -349,6 +366,7 @@ const BookingComponent = () => {
                           placeholder="Your Email"
                           value={formData.email}
                           onChange={handleInputChange}
+                          readOnly
                         />
                         {errors.email && (
                           <div className="invalid-feedback">{errors.email}</div>
@@ -475,7 +493,7 @@ const BookingComponent = () => {
                           id="packagePrice"
                           value={packagePrice}
                           onChange={handleInputChange}
-                          //readOnly // This makes the input read-only
+                          readOnly // This makes the input read-only
                         />
                         <label htmlFor="packagePrice">Package Price</label>
                       </div>

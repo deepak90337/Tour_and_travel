@@ -1,17 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import UserProfile from '../component/UserProfile';
+import AdminProfileComp from '../component/AdminProfileComp';
 
 const Userpage = () => {
   const [loading, setLoading] = useState(true);
 
+  const navigate = useNavigate();
   useEffect(() => {
     // Simulate loading for 2 seconds, replace with your actual loading logic
     setTimeout(() => {
       setLoading(false);
     }, 200);
   }, []);
+         const userToken = localStorage.getItem('Jwt_token');
+         const adminToken = localStorage.getItem('admin_token');
 
+  const renderComp = () =>{
+    if (userToken) {
+        return <UserProfile/>
+    } 
+    if(adminToken){
+     return <AdminProfileComp/>
+    }
+
+    if(!userToken && !adminToken){
+            navigate('/login')
+    }
+  }
+   
     return (
         <>
 
@@ -29,12 +46,12 @@ const Userpage = () => {
                 <div className="container py-5">
                     <div className="row justify-content-center py-5">
                         <div className="col-lg-10 pt-lg-5 mt-lg-5 text-center">
-                            <h1 className="display-3 text-white animated slideInDown">User Profile</h1>
+                            <h1 className="display-3 text-white animated slideInDown">{userToken ? "User Profile" :  adminToken ? "Admin Profile" : "Login Again"}</h1>
                             <nav aria-label="breadcrumb">
                                 <ol className="breadcrumb justify-content-center">
                                 <li className="breadcrumb-item"><Link to="/">Home</Link></li>
     
-                                    <li className="breadcrumb-item text-white active" aria-current="page">User Profile</li>
+                                    <li className="breadcrumb-item text-white active" aria-current="page">{userToken ? "User Profile" : adminToken ? "Admin Profile" : "Login Again"}</li>
                                 </ol>
                             </nav>
                         </div>
@@ -42,8 +59,7 @@ const Userpage = () => {
                 </div>
             </div>
                 )}
-                <UserProfile/>
-                
+                {renderComp()}
         </>
     )
 }

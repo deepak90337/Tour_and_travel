@@ -7,9 +7,11 @@ const ProcessComponent = () => {
             <h6 className="section-title bg-white text-center text-primary px-3">
               Process
             </h6>
-            <h1 className="mb-5">3 Easy Steps</h1>
+            <h1 className="mb-5">2 Easy Steps</h1>
           </div>
-          <div className="row gy-5 gx-4 justify-content-center">
+
+          {/* added : d-flex , removed : justify-content-center*/}
+          <div className="row gy-5 gx-4 d-flex justify-content-around">
             <div
               className="col-lg-4 col-sm-6 text-center pt-4 wow fadeInUp"
               data-wow-delay="0.1s"
@@ -50,7 +52,8 @@ const ProcessComponent = () => {
                 </p>
               </div>
             </div>
-            <div
+            {/* flight container start */}
+            {/* <div
               className="col-lg-4 col-sm-6 text-center pt-4 wow fadeInUp"
               data-wow-delay="0.5s"
             >
@@ -70,7 +73,7 @@ const ProcessComponent = () => {
                   destination today.
                 </p>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

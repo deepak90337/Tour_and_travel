@@ -46,7 +46,7 @@ const Deleteuser = () => {
         console.log('Delete successful');
         setShowSuccess(true);
         setTimeout(() => {
-          navigate('/user');
+          navigate('/dashboard');
         }, 1000);
       }else if(response.status === 400){ setShowAlert(true);} 
       else {

@@ -1,5 +1,6 @@
 const dotenv = require('dotenv');
-dotenv.config({ path: '../router/config.env' });
+// dotenv.config({ path: '../router/config.env' });
+dotenv.config();
 const db = process.env.DATABASE;
 const mongoose = require('mongoose');
 mongoose

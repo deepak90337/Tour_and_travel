@@ -6,8 +6,12 @@ import { useNavigate } from 'react-router-dom';
 export default function Bookinglist() {
     const [email, setEmail] = useState('');
     const [bookingData,setBooking] = useState([]);
+    // const [bookingDatar, setBookingDatar] = useState([]);
+
+ 
     const handleEmailChange = (event) => {
       setEmail(event.target.value);
+    
     };
     const navigate = useNavigate();
     const handleCancelBooking = (bookingId) => {
@@ -19,8 +23,9 @@ export default function Bookinglist() {
         },
       });
     };
-    
+    // console.log("booking list line 29", bookingDatar.tours[0].email);
 
+     
     const handleSearch = async () => {
         const body = JSON.stringify({
             email:email
@@ -65,6 +70,7 @@ export default function Bookinglist() {
       }
     };
 
+      
 
   return (
     
@@ -77,7 +83,18 @@ export default function Bookinglist() {
                 
         <input type="email" value={email} onChange={handleEmailChange} />
        
-       <button onClick={handleSearch} >Search</button>
+       <button onClick={handleSearch}>Search</button>
+
+       <thead>
+       <tr>
+        <td>Name</td>
+        <td>Email</td>
+        <td>Date Of booking</td>
+        <td>Destination</td>
+        <td>Price</td>
+       </tr>
+      
+       </thead>
        {renderResults()}
    
  

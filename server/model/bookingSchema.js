@@ -30,11 +30,15 @@ const BookingSchema = new mongoose.Schema({
         type:String,
         required:false
     },
+    isPaymentDone: { 
+        type: Boolean, 
+        default: false 
+    },
     price : {
         type:String,
         required:false
     },
-});
+}, { timestamps: true });
 
   const Booking = mongoose.model('bookings',BookingSchema);//user_info is collection name and mongodb atlas will create user_infos (plural)
 
